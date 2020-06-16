@@ -5,6 +5,10 @@
 // informação ao mesmo atraves de connect
 import { connect } from 'react-redux';
 
+import { bindActionCreators } from 'redux';
+
+import * as CartActions from '../../store/modules/cart/actions';
+
 import { ProductList } from './styles';
 import { MdAddShoppingCart } from 'react-icons/md';
 import { formatPrice } from '../../util/format';
@@ -30,15 +34,16 @@ class Home extends Component {
     }
 
     handleAddProduct = product => {
-        // dispatch usado para disparar uma action ao redux
-        const { dispatch } = this.props;
+         // implantado sem bindActionCreators do redux
+         // dispatch usado para disparar uma action ao redux
+         // const { dispatch } = this.props;
+         // dispatch - action que informa ao redux que sera feita uma alteração no estado da app, todos reducer
+         // disparando a action ADD_TO_CART que sera ouvida pelo reducer cart
+         // dispatch(CartActions.addToCart(product));
 
-        // dispatch - action que informa ao redux que sera feita uma alteração no estado da app, todos reducer
-        // disparando a action ADD_TO_CART que sera ouvida pelo reducer cart
-        dispatch({
-            type: 'ADD_TO_CART', // nome da action
-            product, // obj enviando
-        });
+         // acessando action da props
+         const { addToCart } = this.props;
+         addToCart(product);
     };
 
 
@@ -73,5 +78,9 @@ class Home extends Component {
     }
 }
 
-// passando o Home para a funcao do conect e exportando
-export default connect()(Home);
+// convertendo action em atributos da function
+const mapDispatchToProps = dispatch =>
+    bindActionCreators(CartActions, dispatch);
+
+// passando o Home para a funcao do connect e exportando
+export default connect(null, mapDispatchToProps)(Home);

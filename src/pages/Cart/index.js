@@ -1,11 +1,18 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 
-import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete } from 'react-icons/md';
+import { bindActionCreators } from 'redux';
+
+import  * as CartActions from '../../store/modules/cart/actions';
+
+import { MdRemoveCircleOutline,
+         MdAddCircleOutline,
+         MdDelete
+         } from 'react-icons/md';
 
 import { Container, ProductTable, Total } from './styles';
 
-function Cart({ cart }) {
+function Cart({ cart, removeFromCart }) {
     return (
         <Container>
             <ProductTable>
@@ -32,7 +39,7 @@ function Cart({ cart }) {
                             </td>
                             <td>
                                 <div>
-                                    <button type="button">
+                                    <button type="button" onClick={() => removeFromCart(product.id)} >
                                         <MdRemoveCircleOutline size={ 20 } color="#7159c1" />
                                     </button>
                                     <input type="number" readOnly value={ product.amount } />
@@ -45,7 +52,10 @@ function Cart({ cart }) {
                                 <strong>R$258,80</strong>
                             </td>
                             <td>
-                                <button type="button" >
+                                <button type="button" onClick={() =>
+                                        //dispatch({ type: 'REMOVE_FROM_CART', id: product.id }) - sen usar bindActionCreators
+                                        removeFromCart(product.id)
+                                } >
                                     <MdDelete size={ 20 } color="#7159c1" />
                                 </button>
                             </td>
@@ -72,5 +82,12 @@ const mapStateToProps = state => ({
     cart: state.cart,
 });
 
+// bindActionCreators - convertendo actions de CartActions em atributos da function principal
+const mapDispathToProps = dispatch => bindActionCreators(CartActions, dispatch);
+
 // acessando via connect o reducer cart do state do redux
-export default connect(mapStateToProps)(Cart);
+export default connect(
+    mapStateToProps,
+    mapDispathToProps
+
+    )(Cart);

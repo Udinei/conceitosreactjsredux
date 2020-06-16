@@ -11,7 +11,7 @@ export default function cart(state = [], action) {
     // implementado para ouvir somente o reducer especifico nesse caso cart
     // adicina um produto no carrinho
     switch (action.type) {
-        case 'ADD_TO_CART':
+        case '@cart/ADD':
 
            // produce funcao do immer, que permite alterar
            // o estado do state do redux, em draft contem uma copia desse estado - rascunho
@@ -19,7 +19,7 @@ export default function cart(state = [], action) {
                // verifica se o produto ja esta cadastrado, no array de produtos
                const productIndex = draft.findIndex(p => p.id === action.product.id);
 
-               // se o produto ja existir no carrinh
+               // produto ja existe no carrinho
                if(productIndex >= 0){
                    // soma 1 em amount
                    draft[productIndex].amount += 1;
@@ -38,6 +38,17 @@ export default function cart(state = [], action) {
            //         ...action.product,
            //         amount: 1, // tudo que tinha em product + campo adicionado ao reducer
            // }];
+        case '@cart/REMOVE':
+            // cria e altera state rascunho draft e o retorna no conteudo do state original
+            return produce(state, draft => {
+                const productIndex = draft.findIndex(p => p.id === action.id)
+
+                // produto foi encontrado
+                if(productIndex >= 0){
+                    // remove produto do state, e atualiza
+                    draft.splice(productIndex, 1);
+                }
+            });
 
         default:
             // retorna estado sem alteração, caso não seja a action  ADD_TO_CART
