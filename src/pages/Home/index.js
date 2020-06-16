@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
-// conecta com o estado do redux, qualquer classe ou function pode se conctar ao estado
+
+// connect - conecta com o estado do redux, qualquer classe ou function pode se conctar ao estado
 // para tando deve estar cadastrada no rootReducer.js do redux e assim receber ou enviar
 // informação ao mesmo atraves de connect
 import { connect } from 'react-redux';

@@ -7,7 +7,7 @@ import { Container, Cart } from './styles';
 
 import logo from '../../assets/images/logo.svg';
 
-function Header({cartSize}) {
+function Header({ cartSize }) {
 
     return (
         <Container>
