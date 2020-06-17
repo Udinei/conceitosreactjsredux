@@ -10,9 +10,11 @@ import { MdRemoveCircleOutline,
          MdDelete
          } from 'react-icons/md';
 
+import { formatPrice } from '../../util/format';
+
 import { Container, ProductTable, Total } from './styles';
 
-function Cart({ cart, removeFromCart, updateAmount }) {
+function Cart({ cart, total, removeFromCart, updateAmount }) {
 
     function increment(product){
         updateAmount(product.id, product.amount + 1);
@@ -59,7 +61,7 @@ function Cart({ cart, removeFromCart, updateAmount }) {
                                 </div>
                             </td>
                             <td>
-                                <strong>R$258,80</strong>
+                                <strong>{product.subTotal}</strong>
                             </td>
                             <td>
                                 <button type="button" onClick={() =>
@@ -79,17 +81,26 @@ function Cart({ cart, removeFromCart, updateAmount }) {
 
                 <Total>
                     <span>TOTAL</span>
-                    <strong>R$1920,28</strong>
+                    <strong>{total}</strong>
                 </Total>
             </footer>
         </Container>
     );
 }
 
-// disponibiliza objeto car do state do redux, para
-// a funcao local, assim que a funcao for chamada
+// converte uma propriedade e cria um nova(subTotal) do state do redux
+// para um atributo da funcao local, assim que a funcao for chamada
 const mapStateToProps = state => ({
-    cart: state.cart,
+    // calculando subtotal e inserindo em product
+    cart: state.cart.map(product => ({
+        ...product,
+        subTotal: formatPrice(product.price * product.amount), // subTotal - inserindo nova propriedade,
+    })),
+    // calculando o total - reduce vai retornar um unico valor
+    total: formatPrice(state.cart.reduce((total, product) => {
+        return total + product.price * product.amount;
+    }, 0)),
+
 });
 
 // bindActionCreators - convertendo actions de CartActions em atributos da function principal

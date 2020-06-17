@@ -33,7 +33,7 @@ class Home extends Component {
 
     }
 
-    handleAddProduct = product => {
+    handleAddProduct = id => {
          // implantado sem bindActionCreators do redux
          // dispatch usado para disparar uma action ao redux
          // const { dispatch } = this.props;
@@ -42,13 +42,14 @@ class Home extends Component {
          // dispatch(CartActions.addToCart(product));
 
          // acessando action da props
-         const { addToCart } = this.props;
-         addToCart(product);
+         const { addToCartRequest } = this.props;
+         addToCartRequest(id);
     };
 
 
     render() {
         const { products } = this.state;
+        const { amount } = this.props; // acessando do props porque estamos usando classe em vez de funcao
 
         return (
             <ProductList>
@@ -63,9 +64,10 @@ class Home extends Component {
                         <span>{ product.priceFormatted }</span>
 
                         <button type="button"
-                                onClick={() => this.handleAddProduct(product)}>
+                                onClick={() => this.handleAddProduct(product.id)}>
                             <div>
-                                <MdAddShoppingCart size={ 16 } color="#FFF"></MdAddShoppingCart> 3
+                                <MdAddShoppingCart size={ 16 } color="#FFF"/> {' '}
+                                {amount[product.id] || 0 }
                          </div>
 
                             <span>ADICIONAR AO CARRINHO</span>
@@ -78,9 +80,21 @@ class Home extends Component {
     }
 }
 
+const mapStateToProps = state => ({
+    // criando propriedade amount(objeto) pra listagem de produtos
+    // e passando a qtd de produtos da propriedade amount de product
+     amount: state.cart.reduce((amount, product) => {
+         amount[product.id] = product.amount;
+         return amount;
+     }, {}),
+});
+
 // convertendo action em atributos da function
 const mapDispatchToProps = dispatch =>
     bindActionCreators(CartActions, dispatch);
 
-// passando o Home para a funcao do connect e exportando
-export default connect(null, mapDispatchToProps)(Home);
+// conectando ao state do redux
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+    )(Home);

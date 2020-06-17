@@ -11,7 +11,7 @@ export default function cart(state = [], action) {
     // implementado para ouvir somente o reducer especifico nesse caso cart
     // adicina um produto no carrinho
     switch (action.type) {
-        case '@cart/ADD':
+        case '@cart/ADD_SUCCESS':
 
            // produce funcao do immer, que permite alterar
            // o estado do state do redux, em draft contem uma copia desse estado - rascunho
@@ -56,6 +56,7 @@ export default function cart(state = [], action) {
                 return state;
             }
 
+            //acessando state do redux
             return produce(state, draft => {
                 const productIndex = draft.findIndex(p => p.id === action.id)
 
