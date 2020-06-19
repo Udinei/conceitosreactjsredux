@@ -43,7 +43,11 @@ class Home extends Component {
 
          // acessando action da props
          const { addToCartRequest } = this.props;
+
+         // disparando action do saga
          addToCartRequest(id);
+
+
     };
 
 

@@ -8,6 +8,7 @@ export function addToCartRequest(id) {
     };
 }
 
+
 // Acessado pelo saga
 export function addToCartSucess(product) {
     return {
@@ -23,9 +24,20 @@ export function removeFromCart(id){
     };
 }
 
-export function updateAmount(id, amount){
+// Para explorar melhor o saga, para cada action
+// nomear duas funçoes de sufixo: Request(usada pelo saga) e Success (usada pedo reducer)
+export function updateAmountRequest(id, amount){
     return {
-        type: '@cart/UPDATE_AMOUNT',
+        type: '@cart/UPDATE_AMOUNT_REQUEST',
+        id,
+        amount
+    }
+}
+
+// funcao usada pelo reducer para alterar qtd e produto no carrinho
+export function updateAmountSuccess(id, amount){
+    return {
+        type: '@cart/UPDATE_AMOUNT_SUCCESS',
         id,
         amount
     }

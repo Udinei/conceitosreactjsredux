@@ -16,7 +16,13 @@ export default function cart(state = [], action) {
            // produce funcao do immer, que permite alterar
            // o estado do state do redux, em draft contem uma copia desse estado - rascunho
            return produce(state, draft => {
-               // verifica se o produto ja esta cadastrado, no array de produtos
+              const { product } = action;
+
+              draft.push(product);
+
+              /*
+              // implementação sem redux e saga
+              // verifica se o produto ja esta cadastrado, no array de produtos
                const productIndex = draft.findIndex(p => p.id === action.product.id);
 
                // produto ja existe no carrinho
@@ -30,10 +36,10 @@ export default function cart(state = [], action) {
                     ...action.product,
                     amount: 1,
                 });
-               }
+               }*/
            });
 
-
+           // Implementacao basica
            //return [...state, {
            //         ...action.product,
            //         amount: 1, // tudo que tinha em product + campo adicionado ao reducer
@@ -49,12 +55,12 @@ export default function cart(state = [], action) {
                     draft.splice(productIndex, 1);
                 }
             });
-        case '@cart/UPDATE_AMOUNT':
-
+        case '@cart/UPDATE_AMOUNT_SUCCESS':
+            // impplementacao sem saga
             // amount nao foi alterado nao faz nada
-            if (action.amount <= 0){
-                return state;
-            }
+            //if (action.amount <= 0){
+            //    return state;
+            // }
 
             //acessando state do redux
             return produce(state, draft => {
