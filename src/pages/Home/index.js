@@ -1,11 +1,8 @@
-﻿import React, { Component } from 'react';
+﻿//useState - hooks para acesso ao estado
+import React, { useState, useEffect } from 'react';
 
-// connect - conecta com o estado do redux, qualquer classe ou function pode se conctar ao estado
-// para tando deve estar cadastrada no rootReducer.js do redux e assim receber ou enviar
-// informação ao mesmo atraves de connect
-import { connect } from 'react-redux';
-
-import { bindActionCreators } from 'redux';
+// acessando state com hooks
+import { useDispatch, useSelector } from 'react-redux';
 
 import * as CartActions from '../../store/modules/cart/actions';
 
@@ -15,90 +12,76 @@ import { formatPrice } from '../../util/format';
 
 import api from '../../services/api';
 
-class Home extends Component {
+export default function Home() {
 
-    state = {
-        products: [],
+    // inicia o state product com array vazio
+    const [products, setProducts] = useState([]);
+
+    // retornando o stado do redux
+    const amount = useSelector(state => state.cart.reduce((amount, product) => {
+        amount[product.id] = product.amount;
+        return amount;
+    }, {}),)
+
+    // implenentando acesso a actions do redux com useDispatch
+    const dispatch = useDispatch();
+
+    // useEffect - hooks que simula o componente didMount, executa quando o componente form montado
+    useEffect(() => {
+
+        async function loadProducts() {
+            const response = await api.get('products');
+
+            const data = response.data.map(product => ({
+                ...product,
+                priceFormatted: formatPrice(product.price),
+            }));
+
+            setProducts(data);
+        }
+
+        loadProducts();
+    }, []); // array vazio, essa funcao sera executada apenas uma vez
+
+
+    // não usa useCallback, porque não tem dependencia de alteração de variavel dentro dela
+    function handleAddProduct(id) {
+        // implantado sem bindActionCreators do redux
+        // dispatch usado para disparar uma action ao redux
+        // const { dispatch } = this.props;
+        // dispatch - action que informa ao redux que sera feita uma alteração no estado da app, todos reducer
+        // disparando a action ADD_TO_CART que sera ouvida pelo reducer cart
+        // dispatch(CartActions.addToCart(product));
+
+
+        // disparando action do saga
+        dispatch(CartActions.addToCartRequest(id));
     };
 
-    async componentDidMount() {
-        const response = await api.get('products');
+    return (
+        <ProductList>
+            { products.map(product => (
+                <li key={ product.id }>
+                    <img src={ product.image }
+                        alt={ product.title }
+                    />
+                    <strong>
+                        { product.title }
+                    </strong>
+                    <span>{ product.priceFormatted }</span>
 
-        const data = response.data.map(product => ({
-            ...product,
-            priceFormatted: formatPrice(product.price),
-        }))
+                    <button type="button"
+                        onClick={ () => handleAddProduct(product.id) }>
+                        <div>
+                            <MdAddShoppingCart size={ 16 } color="#FFF" /> { ' ' }
+                            { amount[product.id] || 0 }
+                        </div>
 
-        this.setState({ products: data });
-
-    }
-
-    handleAddProduct = id => {
-         // implantado sem bindActionCreators do redux
-         // dispatch usado para disparar uma action ao redux
-         // const { dispatch } = this.props;
-         // dispatch - action que informa ao redux que sera feita uma alteração no estado da app, todos reducer
-         // disparando a action ADD_TO_CART que sera ouvida pelo reducer cart
-         // dispatch(CartActions.addToCart(product));
-
-         // acessando action da props
-         const { addToCartRequest } = this.props;
-
-         // disparando action do saga
-         addToCartRequest(id);
-
-
-    };
-
-
-    render() {
-        const { products } = this.state;
-        const { amount } = this.props; // acessando do props porque estamos usando classe em vez de funcao
-
-        return (
-            <ProductList>
-                { products.map(product => (
-                    <li key={ product.id }>
-                        <img src={ product.image }
-                            alt={ product.title }
-                        />
-                        <strong>
-                            { product.title }
-                        </strong>
-                        <span>{ product.priceFormatted }</span>
-
-                        <button type="button"
-                                onClick={() => this.handleAddProduct(product.id)}>
-                            <div>
-                                <MdAddShoppingCart size={ 16 } color="#FFF"/> {' '}
-                                {amount[product.id] || 0 }
-                         </div>
-
-                            <span>ADICIONAR AO CARRINHO</span>
-                        </button>
-                    </li>
-                ))
-                }
-            </ProductList>
-        );
-    }
+                        <span>ADICIONAR AO CARRINHO</span>
+                    </button>
+                </li>
+            ))
+            }
+        </ProductList>
+    );
 }
-
-const mapStateToProps = state => ({
-    // criando propriedade amount(objeto) pra listagem de produtos
-    // e passando a qtd de produtos da propriedade amount de product
-     amount: state.cart.reduce((amount, product) => {
-         amount[product.id] = product.amount;
-         return amount;
-     }, {}),
-});
-
-// convertendo action em atributos da function
-const mapDispatchToProps = dispatch =>
-    bindActionCreators(CartActions, dispatch);
-
-// conectando ao state do redux
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-    )(Home);

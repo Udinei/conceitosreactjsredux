@@ -1,7 +1,5 @@
 ﻿import React from 'react';
-import { connect } from 'react-redux';
-
-import { bindActionCreators } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import  * as CartActions from '../../store/modules/cart/actions';
 
@@ -14,14 +12,25 @@ import { formatPrice } from '../../util/format';
 
 import { Container, ProductTable, Total } from './styles';
 
-function Cart({ cart, total, removeFromCart, updateAmountRequest }) {
+export default function Cart() {
+    const total =  useSelector(state => formatPrice(state.cart.reduce((total, product) => {
+        return total + product.price * product.amount;
+    }, 0)
+    ));
+
+    const cart = useSelector(state => state.cart.map(product => ({
+        ...product,
+        subTotal: formatPrice(product.price * product.amount), // subTotal - inserindo nova propriedade,
+    })));
+
+    const dispatch = useDispatch();
 
     function increment(product){
-        updateAmountRequest(product.id, product.amount + 1);
+        dispatch(CartActions.updateAmountRequest(product.id, product.amount + 1));
     }
 
     function decrement(product){
-        updateAmountRequest(product.id, product.amount -1);
+        dispatch(CartActions.updateAmountRequest(product.id, product.amount -1));
     }
 
 
@@ -66,7 +75,7 @@ function Cart({ cart, total, removeFromCart, updateAmountRequest }) {
                             <td>
                                 <button type="button" onClick={() =>
                                         //dispatch({ type: 'REMOVE_FROM_CART', id: product.id }) - sen usar bindActionCreators
-                                        removeFromCart(product.id)
+                                        dispatch(CartActions.removeFromCart(product.id))
                                 } >
                                     <MdDelete size={ 20 } color="#7159c1" />
                                 </button>
@@ -87,28 +96,3 @@ function Cart({ cart, total, removeFromCart, updateAmountRequest }) {
         </Container>
     );
 }
-
-// converte uma propriedade e cria um nova(subTotal) do state do redux
-// para um atributo da funcao local, assim que a funcao for chamada
-const mapStateToProps = state => ({
-    // calculando subtotal e inserindo em product
-    cart: state.cart.map(product => ({
-        ...product,
-        subTotal: formatPrice(product.price * product.amount), // subTotal - inserindo nova propriedade,
-    })),
-    // calculando o total - reduce vai retornar um unico valor
-    total: formatPrice(state.cart.reduce((total, product) => {
-        return total + product.price * product.amount;
-    }, 0)),
-
-});
-
-// bindActionCreators - convertendo actions de CartActions em atributos da function principal
-const mapDispathToProps = dispatch => bindActionCreators(CartActions, dispatch);
-
-// acessando via connect o reducer cart do state do redux
-export default connect(
-    mapStateToProps,
-    mapDispathToProps
-
-    )(Cart);

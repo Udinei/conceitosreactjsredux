@@ -1,13 +1,16 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux'; // concectando com redux
+import { useSelector } from 'react-redux'; // useSelect - hook concectando com redux
 
 import { MdShoppingBasket } from 'react-icons/md';
 import { Container, Cart } from './styles';
 
 import logo from '../../assets/images/logo.svg';
 
-function Header({ cartSize }) {
+export default function Header() {
+
+    // obtendo qtd de elemento no carrinho via state do redux, usando hooks useSelector
+    const  cartSize = useSelector(state => state.cart.length)
 
     return (
         <Container>
@@ -25,11 +28,5 @@ function Header({ cartSize }) {
     );
 }
 
-// expoem objetos do estado do redux a funcao Header,
-// no caso cart, que quando for alterado em algum lugar da
-// app fara com que o render de Header seja executado,
-// cart deve ser passado como parametro.
-export default connect(state => ({
-    cartSize: state.cart.length,
-}))(Header);
+
 

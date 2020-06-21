@@ -59,7 +59,9 @@ function* addToCart({ id }) {
         // retornando o controle para o reducer adicionar produto ao carrinho
         // disparando action,
         yield put(addToCartSucess(data));
-        // navegando para o carrinho via saga
+
+        // redireciona somente apos o put acima ser finalizado
+        //navegando para o carrinho via saga
         history.push('/cart');
 
 
